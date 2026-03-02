@@ -480,15 +480,42 @@
   );
   document.querySelectorAll('.fade-up').forEach((el) => observer.observe(el));
 
-  // Simple email form handler (placeholder)
-  function handleSubmit(e) {
+  // Email signup — sends to Cloudflare Worker → GitHub Issues
+  // Replace this URL with your deployed Worker URL
+  const WORKER_URL = 'https://modularitsm-signup.YOUR_SUBDOMAIN.workers.dev';
+
+  async function handleSubmit(e) {
     e.preventDefault();
     const input = e.target.querySelector('input');
     const btn = e.target.querySelector('button');
-    btn.textContent = 'Thanks!';
-    btn.style.background = 'linear-gradient(135deg, #34d399, #059669)';
-    input.disabled = true;
+    const email = input.value.trim();
+
+    btn.textContent = 'Sending…';
     btn.disabled = true;
+
+    try {
+      const res = await fetch(WORKER_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+
+      if (res.ok) {
+        btn.textContent = 'You\'re on the list!';
+        btn.style.background = 'linear-gradient(135deg, #34d399, #059669)';
+        input.disabled = true;
+      } else {
+        throw new Error('Request failed');
+      }
+    } catch (err) {
+      btn.textContent = 'Try Again';
+      btn.disabled = false;
+      btn.style.background = 'linear-gradient(135deg, #ef4444, #dc2626)';
+      setTimeout(() => {
+        btn.textContent = 'Notify Me';
+        btn.style.background = 'linear-gradient(135deg, var(--accent), #4f46e5)';
+      }, 2000);
+    }
   }
 </script>
 
