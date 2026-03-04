@@ -143,35 +143,61 @@
       color: var(--muted); font-size: 1.05rem; max-width: 600px; margin-bottom: 56px;
     }
 
-    /* ── Screenshots ───────────────────────────────── */
+    /* ── Screenshots (tabbed gallery) ─────────────── */
     #screenshots { text-align: center; }
-    .screenshot-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 24px;
-    }
-    .screenshot-card {
+    .ss-gallery {
+      display: flex; gap: 0;
       background: var(--surface); border: 1px solid var(--border);
       border-radius: var(--radius); overflow: hidden;
-      transition: border-color .2s, box-shadow .2s, transform .2s;
+      text-align: left; min-height: 420px;
     }
-    .screenshot-card:hover {
-      border-color: var(--accent);
-      box-shadow: 0 0 32px var(--glow);
-      transform: translateY(-3px);
+    .ss-tabs {
+      width: 260px; flex-shrink: 0;
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column;
+      overflow-y: auto;
     }
-    .screenshot-card img {
-      width: 100%; height: auto; display: block;
+    .ss-tab {
+      padding: 16px 20px; cursor: pointer;
       border-bottom: 1px solid var(--border);
+      transition: background .2s, border-color .2s;
+      position: relative;
     }
-    .screenshot-card .caption {
-      padding: 16px 20px; text-align: left;
+    .ss-tab:last-child { border-bottom: none; }
+    .ss-tab:hover { background: rgba(99,102,241,.06); }
+    .ss-tab.active {
+      background: rgba(99,102,241,.1);
     }
-    .screenshot-card .caption h3 {
-      font-size: .95rem; font-weight: 600; margin-bottom: 4px;
+    .ss-tab.active::before {
+      content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+      width: 3px; background: var(--accent-l); border-radius: 0 2px 2px 0;
     }
-    .screenshot-card .caption p {
-      color: var(--muted); font-size: .82rem;
+    .ss-tab h3 {
+      font-size: .88rem; font-weight: 600; margin-bottom: 2px;
+      color: var(--text);
+    }
+    .ss-tab p {
+      font-size: .75rem; color: var(--muted); line-height: 1.4;
+    }
+    .ss-preview {
+      flex: 1; display: flex; align-items: center; justify-content: center;
+      padding: 24px; position: relative; overflow: hidden;
+      background: var(--bg);
+    }
+    .ss-preview img {
+      max-width: 100%; max-height: 520px; height: auto;
+      border-radius: 8px; box-shadow: 0 4px 24px rgba(0,0,0,.4);
+      display: none;
+    }
+    .ss-preview img.active { display: block; }
+
+    /* Mobile: stack vertically, show as accordion */
+    @media (max-width: 768px) {
+      .ss-gallery {
+        flex-direction: column; min-height: auto;
+      }
+      .ss-tabs { width: 100%; border-right: none; }
+      .ss-preview { min-height: 280px; }
     }
 
     /* ── Architecture ───────────────────────────────── */
@@ -292,7 +318,7 @@
     @media (max-width: 640px) {
       .hero { padding: 100px 20px 60px; }
       section { padding: 72px 0; }
-      .arch-grid, .mod-grid, .screenshot-grid { grid-template-columns: 1fr; }
+      .arch-grid, .mod-grid { grid-template-columns: 1fr; }
       .nav-links { gap: 12px; }
     }
   </style>
@@ -356,69 +382,50 @@
       Here's what ModularITSM looks like right now.
     </p>
 
-    <div class="screenshot-grid">
-      <div class="screenshot-card fade-up">
-        <img src="screenshots/modules.png" alt="ITSM Modules" loading="lazy">
-        <div class="caption">
+    <div class="ss-gallery fade-up">
+      <div class="ss-tabs">
+        <div class="ss-tab active" data-ss="0">
           <h3>Modular by Design</h3>
-          <p>Enable only the modules you need. Incident Management is always on — everything else is optional.</p>
+          <p>Enable only the modules you need — everything beyond incidents is optional.</p>
         </div>
-      </div>
-
-      <div class="screenshot-card fade-up">
-        <img src="screenshots/roles-permissions.png" alt="Roles & Permissions" loading="lazy">
-        <div class="caption">
-          <h3>Granular Role-Based Access</h3>
-          <p>Five built-in roles with 30+ permissions, custom roles, and SSO role mapping.</p>
+        <div class="ss-tab" data-ss="1">
+          <h3>Roles &amp; Permissions</h3>
+          <p>30+ granular permissions with five built-in roles and custom role support.</p>
         </div>
-      </div>
-
-      <div class="screenshot-card fade-up">
-        <img src="screenshots/audit-logs.png" alt="Audit Logs" loading="lazy">
-        <div class="caption">
-          <h3>Tamper-Evident Audit Logs</h3>
-          <p>Every action tracked with SHA-256 integrity hashing. Compliance framework evaluations built in.</p>
+        <div class="ss-tab" data-ss="2">
+          <h3>Audit Logs</h3>
+          <p>SHA-256 integrity hashing, compliance framework evaluations.</p>
         </div>
-      </div>
-
-      <div class="screenshot-card fade-up">
-        <img src="screenshots/incident-categories.png" alt="Incident Categories" loading="lazy">
-        <div class="caption">
-          <h3>Configurable Categories</h3>
-          <p>Organize incidents by category with sector-specific presets for IT, higher ed, and enterprise.</p>
+        <div class="ss-tab" data-ss="3">
+          <h3>Incident Categories</h3>
+          <p>Sector-specific presets for IT, higher ed, and enterprise.</p>
         </div>
-      </div>
-
-      <div class="screenshot-card fade-up">
-        <img src="screenshots/groups.png" alt="Assignment Groups" loading="lazy">
-        <div class="caption">
+        <div class="ss-tab" data-ss="4">
           <h3>Assignment Groups</h3>
-          <p>Organize your team into functional groups for ticket routing and workload management.</p>
+          <p>Team-based ticket routing and workload management.</p>
+        </div>
+        <div class="ss-tab" data-ss="5">
+          <h3>Service Monitoring</h3>
+          <p>Track external service health with alert banners.</p>
+        </div>
+        <div class="ss-tab" data-ss="6">
+          <h3>Instance Settings</h3>
+          <p>Environment profiles, branding, attachment config.</p>
+        </div>
+        <div class="ss-tab" data-ss="7">
+          <h3>Announcements</h3>
+          <p>Broadcast messages with publish, draft, and expiration workflows.</p>
         </div>
       </div>
-
-      <div class="screenshot-card fade-up">
+      <div class="ss-preview">
+        <img src="screenshots/modules.png" alt="ITSM Modules" class="active" loading="lazy">
+        <img src="screenshots/roles-permissions.png" alt="Roles & Permissions" loading="lazy">
+        <img src="screenshots/audit-logs.png" alt="Audit Logs" loading="lazy">
+        <img src="screenshots/incident-categories.png" alt="Incident Categories" loading="lazy">
+        <img src="screenshots/groups.png" alt="Assignment Groups" loading="lazy">
         <img src="screenshots/service-monitoring.png" alt="Service Monitoring" loading="lazy">
-        <div class="caption">
-          <h3>Service Health Monitoring</h3>
-          <p>Track the status of external services your team depends on, with alert banners when things go down.</p>
-        </div>
-      </div>
-
-      <div class="screenshot-card fade-up">
         <img src="screenshots/settings-general.png" alt="Instance Settings" loading="lazy">
-        <div class="caption">
-          <h3>Instance Configuration</h3>
-          <p>Environment profiles, attachment settings, branding — each instance is fully customizable.</p>
-        </div>
-      </div>
-
-      <div class="screenshot-card fade-up">
         <img src="screenshots/announcements.png" alt="Announcements" loading="lazy">
-        <div class="caption">
-          <h3>System Announcements</h3>
-          <p>Broadcast messages to your organization with publish, draft, and expiration workflows.</p>
-        </div>
       </div>
     </div>
   </div>
@@ -613,6 +620,19 @@
     { threshold: 0.15 }
   );
   document.querySelectorAll('.fade-up').forEach((el) => observer.observe(el));
+
+  // Screenshot tab gallery
+  const tabs = document.querySelectorAll('.ss-tab');
+  const imgs = document.querySelectorAll('.ss-preview img');
+  tabs.forEach((tab) => {
+    tab.addEventListener('click', () => {
+      const idx = parseInt(tab.dataset.ss, 10);
+      tabs.forEach((t) => t.classList.remove('active'));
+      imgs.forEach((i) => i.classList.remove('active'));
+      tab.classList.add('active');
+      imgs[idx].classList.add('active');
+    });
+  });
 </script>
 
 </body>
